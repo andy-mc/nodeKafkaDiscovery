@@ -52,14 +52,6 @@ const gracefullyShutdown = async (consumer, openSearchClient) => {
 const main = async () => {
   const openSearchClient = createOpenSearchClient();
   const consumer = await createKafkaConsumer();
-  // Add SIGTERM handler
-  process.on('SIGTERM', async () => {
-    await gracefullyShutdown(consumer, openSearchClient);
-  });
-  // Existing SIGINT handler
-  process.on('SIGINT', async () => {
-    await gracefullyShutdown(consumer, openSearchClient);
-  });
 
   const indexExists = await openSearchClient.indices.exists({ index: 'wikimedia' });
 
@@ -87,6 +79,15 @@ const main = async () => {
         console.error('Failed to index document:', error);
       }
     },
+  });
+
+  // Add SIGTERM handler
+  process.on('SIGTERM', async () => {
+    await gracefullyShutdown(consumer, openSearchClient);
+  });
+  // Existing SIGINT handler
+  process.on('SIGINT', async () => {
+    await gracefullyShutdown(consumer, openSearchClient);
   });
 };
 
