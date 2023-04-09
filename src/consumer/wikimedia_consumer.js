@@ -1,3 +1,5 @@
+// npm run dev --  src/consumer/wikimedia_consumer.js 
+
 const { Kafka } = require('kafkajs');
 const { Client } = require('@opensearch-project/opensearch');
 const config = require('../config');

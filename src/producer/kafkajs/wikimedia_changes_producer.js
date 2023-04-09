@@ -1,3 +1,5 @@
+// npm run dev -- src/producer/kafkajs/wikimedia_changes_producer.js
+
 const { Kafka } = require("kafkajs");
 const EventSource = require("eventsource");
 const config = require('../../config');
