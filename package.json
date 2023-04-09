@@ -1,0 +1,21 @@
+{
+  "name": "nodekafka",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.6.0",
+    "@opensearch-project/opensearch": "^2.2.0",
+    "dotenv": "^16.0.3",
+    "eventsource": "^2.0.2",
+    "kafka-node": "^5.0.0",
+    "kafkajs": "^2.2.4",
+    "loglevel": "^1.8.1"
+  }
+}
