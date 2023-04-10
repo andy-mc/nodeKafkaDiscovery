@@ -22,7 +22,10 @@ const createKafkaConsumer = async () => {
     },
   });
 
-  const consumer = kafka.consumer({ groupId: 'consumer-opensearch-demo' });
+  const consumer = kafka.consumer({ 
+    groupId: 'consumer-opensearch-demo',
+    autoOffsetReset: 'earliest',
+   });
   await consumer.connect();
   return consumer;
 };
@@ -77,7 +80,7 @@ const main = async () => {
     console.log('The Wikimedia Index already exists');
   }
 
-  await consumer.subscribe({ topic: 'wikimedia.recentchange', fromBeginning: false });
+  await consumer.subscribe({ topic: 'wikimedia.recentchange', fromBeginning: true });
 
   let docsToIndex = [];
   const bulkThreshold = 2 * 10; // Adjust this value based on your requirements
