@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=dev node",
-    "stg": "cross-env NODE_ENV=stg node"
+    "dev": "cross-env NODE_ENV=dev nodemon",
+    "stg": "cross-env NODE_ENV=stg nodemon"
   },
   "keywords": [],
   "author": "",

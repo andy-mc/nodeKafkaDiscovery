@@ -49,6 +49,21 @@ const gracefullyShutdown = async (consumer, openSearchClient) => {
   }
 };
 
+const sendBulkRequest = async (openSearchClient, docsToIndex) => {
+  try {
+    const bulkResponse = await openSearchClient.bulk({ body: docsToIndex });
+    bulkResponse.body.items.forEach((item) => {
+      console.error(`document: ${item.index._id} - ${item.index.result} - ${item.index.status}`);
+    });
+
+    console.log(`Indexed ${bulkResponse.body.items.length} documents in a bulk request`);
+    return bulkResponse;
+  } catch (error) {
+    console.error('Failed to send bulk request:', error);
+    return error
+  }
+};
+
 const main = async () => {
   const openSearchClient = createOpenSearchClient();
   const consumer = await createKafkaConsumer();
@@ -64,17 +79,29 @@ const main = async () => {
 
   await consumer.subscribe({ topic: 'wikimedia.recentchange', fromBeginning: false });
 
+  let docsToIndex = [];
+  const bulkThreshold = 2 * 10; // Adjust this value based on your requirements
+
+  let timeoutId;
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
+      clearTimeout(timeoutId); // Clear any existing timeout
+
       try {
         const id = extractId(message.value.toString());
-        const indexRequest = {
-          index: 'wikimedia',
-          id,
-          body: JSON.parse(message.value.toString()),
-        };
-        const response = await openSearchClient.index(indexRequest);
-        console.log(`Indexed document with ID: ${response.body._id}`);
+        docsToIndex.push({ index: { _index: 'wikimedia', _id: id } });
+        docsToIndex.push(JSON.parse(message.value.toString()));
+
+        if (docsToIndex.length >= bulkThreshold) {
+          await sendBulkRequest(openSearchClient, docsToIndex);
+          docsToIndex = [];
+        } else {
+          console.log('timeoutBulk')
+          timeoutId = setTimeout(async () => {
+            await sendBulkRequest(openSearchClient, docsToIndex);
+            docsToIndex = [];
+          }, 1000);
+        }
       } catch (error) {
         console.error('Failed to index document:', error);
       }
